@@ -80,7 +80,7 @@ module Verify
       if `which wget` && $? == 0 then
         'wget'
       elsif `which curl` && $? == 0 then
-        `curl -O`
+        'curl -O'
       else
         raise 'Unable to find curl or wget, install one of them and get back to me.'
       end
