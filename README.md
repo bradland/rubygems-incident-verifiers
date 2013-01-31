@@ -59,6 +59,10 @@ If you encounter a "fail", please review the contents of the mismatched files. A
 
 [form]:https://docs.google.com/forms/d/1ww3Icilk2U2VsULv64-27Wz2yHXMAteuUdlfjaqtkAs/viewform
 
+## Contributors ##
+
+Thanks to cowboyd and revans for contributing the scripts.
+
 ## Why all this? ##
 
 The Rubygems.org server was compromised by a remote code vulnerability exploit. Details available at official Rubygems sources.
