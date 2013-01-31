@@ -61,7 +61,7 @@ If you encounter a "fail", please review the contents of the mismatched files. A
 
 ## Contributors ##
 
-Thanks to cowboyd and revans for contributing the scripts.
+Thanks to @cowboyd and @revans for contributing the scripts.
 
 ## Why all this? ##
 
