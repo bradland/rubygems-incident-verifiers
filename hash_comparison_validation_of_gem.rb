@@ -12,7 +12,6 @@
 
 require 'openssl'
 require 'digest/sha1'
-require 'pathname'
 require 'zlib'
 
 module Verify
@@ -21,28 +20,27 @@ module Verify
     def initialize(gem)
       @gem = gem
       @gem_basename = File.basename(gem)
-      @rubygems_hash_file = Pathname.new($0).join("../rubygems-shas.txt").expand_path
+      @rubygems_hash_file = "rubygems-shas.txt"
     end
 
     def validate
       raise "Could not find your Gem" unless @gem_basename
-      # fetch_shas("http://cl.ly/MYie/download/rubygems-shas.txt.gz")
+      fetch_shas("http://cl.ly/MYie/download/rubygems-shas.txt.gz")
       verify_hashes
     end
 
     private
 
-    # leaving this here, incase we do need to download this file again
-    # def fetch_shas(file)
-    #   return if File.exists?(rubygems_hash_file)
+    def fetch_shas(file)
+      return if File.exists?(rubygems_hash_file)
 
-    #   `wget #{file}`
-    #   Zlib::GzipReader.open(File.basename(file)) do |gz|
-    #     File.open(rubygems_hash_file, 'w') do |file|
-    #       file.write(gz.read)
-    #     end
-    #   end
-    # end
+      `wget #{file}`
+      Zlib::GzipReader.open(File.basename(file)) do |gz|
+        File.open(rubygems_hash_file, 'w') do |file|
+          file.write(gz.read)
+        end
+      end
+    end
 
     def remote_hash
       open(rubygems_hash_file) { |f| f.grep(/#{gem_basename}/) }.first.split(' ').first.strip
