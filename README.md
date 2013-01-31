@@ -1,4 +1,4 @@
-# Info for gem owners #
+# Gem validation for gem owners #
 
 **Please only perform these steps if you are the Gem owner.**
 
