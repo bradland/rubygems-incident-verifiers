@@ -34,7 +34,7 @@ module Verify
     def fetch_shas(file)
       return if File.exists?(rubygems_hash_file)
 
-      `wget #{file}`
+      `#{downloader} #{file}`
       Zlib::GzipReader.open(File.basename(file)) do |gz|
         File.open(rubygems_hash_file, 'w') do |file|
           file.write(gz.read)
@@ -75,8 +75,17 @@ module Verify
     def failure_message
       "Try checking out the RubyGems incident Doc and use the unpack script: https://github.com/bradland/rubygems-incident-verifiers"
     end
-
-
+    
+    def downloader
+      if `which wget` && $? == 0 then
+        'wget'
+      elsif `which curl` && $? == 0 then
+        `curl -O`
+      else
+        raise 'Unable to find curl or wget, install one of them and get back to me.'
+      end
+    end
+    
   end
 end
 Verify::Gem.new(ARGV[0]).validate
