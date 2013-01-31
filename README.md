@@ -1,91 +1,64 @@
-# Info for gem owners
+# Info for gem owners #
 
 **Please only perform these steps if you are the Gem owner.**
 
 ##Summary
 
-The tools provided here enable you to check local copies of your gem to the copies present on Rubygems.org. These tools are intended for gem developers to check their local dev copies against the Rubygems.org server.
+The tools provided here enable you to check local copies of your gem to the copies present on Rubygems.org. These tools are intended for gem developers to check their local dev copies against the Rubygems.org server (why? see note at end of doc).
 
 There are a few verification efforts going on right now:
 
 1. Verify against mirrors (close to complete)
 2. Users verify their local gems against rubygems (there are sepaerate scripts for this)
-3. Gem owners verify against Rubygems.org (you’re about to learn how)
+3. Gem owners verify against Rubygems.org (you're about to learn how)
 
-As a gem owner, you can help us out by verifying your local .gem file against the .gem file in the Rubygems.org S3 bucket. This process is optional, but it helps us rebuild trust in Rubygems.org, so we’d appreciate any effort you can contribute.
+As a gem owner, you can help us out by verifying your local .gem file against the .gem file in the Rubygems.org S3 bucket. This process is optional, but it helps us rebuild trust in Rubygems.org, so we'd appreciate any effort you can contribute.
 
-Before you begin, please be note that there are TWO ways to accomplish this. The first only works if you have the *original* .gem file you published to the Rubygems.org website. If not, please look ahead to the second option.
+Before you begin, please note that there are TWO ways to accomplish this. The first only works if you have the *original* .gem file you published to the Rubygems.org website. If not, please look ahead to the second option.
 
-## I have my original .gem file
+## Option 1 - I have my original .gem file ##
 
 If you have a copy of the original .gem file that you pushed to rubygems.org, you can verify a checksum of both files.
 
-* Use the validate_original_gem.sh script to verify your local gem package against Rubygems.org
-* If you encounter a mismatch, please post results to this Google Form
+**IMPORTANT!** The checksum method will fail if you are not using the *exact* same .gem file originally submitted to Rubygems.org. That is expected.
 
-#### Scripts needed (IN WORK by revans):
+You should read the script you're about to run. You can view the formatted source by clicking the file `hash_comparison_validation_of_gem.rb` here in the Github repo, then follow these steps.
 
-**Compare gem to Rubygems.org hashes**
+Fire up a terminal and cd to the `pkg/` directory where you build your gem, or whatever other location you store your gem packages. Then:
 
-Script can be written in Ruby or bash. Compare hash of local .gem (passed as arg) to Rubygems.org .gem hash list.
+    wget https://raw.github.com/bradland/rubygems-incident-verifiers/master/hash_comparison_validation_of_gem.rb
+    chmod u+x hash_comparison_validation_of_gem.rb
 
-Invocation: `file_by_file_validation_of_gem.rb ./path/to/gemfile.gem`
+You can now run the validator against your gem files. If you were validating a gem named `gemfile-0.0.0.gem`, you'd do the following.
 
-Returns: 
+    hash_comparison_validation_of_gem.rb gemfile-0.0.0.gem
 
-    Gem compared: <gemname-0.0.0.gem>
-      Remote hash: <hash>
-      Local hash:  <hash>
-    Overall result: [PASS|FAIL]
+The script will output the result of comparison beetween a hash of your gem file, and provide an overall pass/fail for the comparison.
 
-The script should:
+If you encounter a "fail", please try the additional verification method listed under Option 2. After review, submit your results in the [Google Form][form] if you feel action is required.
 
-* Grab the hash list from either/or
-    * Rubygems (MD5): http://cl.ly/MY8P
-    * Rubygems (SHA512): http://cl.ly/MYie
-    * Script should prefer SHA512 if possible
-* Use basename of ARGV[0] to lookup gem hash
-    * Err if not found
-* Display the hashes for each
-* Indicate an overall pass/fail
-    * PASS on match between both hashes
-    * FAIL on mismatch
-* If FAIL, suggest that they revisit this doc to use the unpack script (below)
 
-## I do NOT have my original .gem file
+## Option 2 - I do NOT have my original .gem file ##
 
-If you do not have your original .gem file, we’ll need you to verify the contents of the .gem hosted on Rubygems.org S3 and a .gem file built locally.
+If you do not have your original .gem file, you'll need you to verify the contents of the .gem hosted on Rubygems.org S3 and a .gem file built locally.
 
-* Use the validate_original_gem_unpack.sh script to verify your local gem contents against Rubygems.org
-* If you encounter a mismatch, please review the contents of the mismatched files
-* After review, submit your results in the Google Form
+You should read the script you're about to run. You can view the formatted source by clicking the file `file_by_file_validation_of_gem.rb` here in the Github repo, then follow these steps.
 
-#### Scripts needed (IN WORK by cowboyd):
+Fire up a terminal and cd to the `pkg/` directory where you build your gem, or whatever other location you store your gem packages. Then:
 
-Script can be written in Ruby or bash. Compare contents of unpacked local .gem to unpacked Rubygems.org S3 .gem.
+    wget https://raw.github.com/bradland/rubygems-incident-verifiers/master/file_by_file_validation_of_gem.rb
+    chmod u+x file_by_file_validation_of_gem.rb
 
-Invocation: `validate_original_gem_unpack.sh ./path/to/gemfile.gem`
+You can now run the validator against your gem files. If you were validating a gem named `gemfile-0.0.0.gem`, you'd do the following.
 
-Returns:
+    file_by_file_validation_of_gem.rb gemfile-0.0.0.gem
 
-    Files compared:
-      path/to/file1.ext - [pass|fail]
-      path/to/file2.ext - [pass|fail]
-      path/to/file3.ext - [REMOTE ORPHAN]
-    Overall result: [PASS|FAIL]
+The script will output the result of comparison beetween each file in your gem, and provide an overall pass/fail for the comparison.
 
-The script should: 
+If you encounter a "fail", please review the contents of the mismatched files. After review, submit your results in the [Google Form][form] if you feel action is required.
 
-* Download the matching .gem from S3
-    * Use basename from ARGV[0] to build S3 gem path
-        * S3 gem path: http://production.cf.rubygems.org/gems/<basename>
-    * Err if remote file not found
-* Unpack S3 .gem file
-    * Err if unable to unpack (some corrupt gems exist on S3)
-* Unpack .gem file from ARGV[0]
-* Iterate over files in .gem file from S3
-    * Report pass/fail based on SHA512 comparison of corresponding files
-    * Report remote orphans (files that exist in S3 gem, but not locally)
-* Report an overall pass/fail
-    * PASS on all checksums matched AND no orphans found
-    * FAIL on checksum mismatch OR orphan found
+[form]:https://docs.google.com/forms/d/1ww3Icilk2U2VsULv64-27Wz2yHXMAteuUdlfjaqtkAs/viewform
+
+## Why all this? ##
+
+The Rubygems.org server was compromised by a remote code vulnerability exploit. Details available at official Rubygems sources.
