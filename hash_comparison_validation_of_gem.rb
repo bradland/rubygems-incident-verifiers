@@ -88,4 +88,11 @@ module Verify
     
   end
 end
-Verify::Gem.new(ARGV[0]).validate
+
+gem_to_verify = ARGV.first
+
+if gem_to_verify then
+  Verify::Gem.new(gem_to_verify).validate
+else
+  warn "usage: #{File.basename $0} my-gem-0.0.1.gem"
+end
