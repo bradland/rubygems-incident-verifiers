@@ -1,5 +1,7 @@
 # Gem validation for gem owners #
 
+[![Join the chat at https://gitter.im/bradland/rubygems-incident-verifiers](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/bradland/rubygems-incident-verifiers?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 **Please only perform these steps if you are the Gem owner.**
 
 ##Summary
